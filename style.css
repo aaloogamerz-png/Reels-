@@ -75,3 +75,32 @@ body{font-family:Inter, system-ui, Arial, sans-serif;background:#000;color:#fff;
   .reel-info{max-width:75%}
   .reels-list .thumb{width:calc(50% - 8px)}
 }
+/* Hide default file input */
+input[type="file"] {
+  display: none;
+}
+
+/* Custom upload button */
+.custom-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ff004f;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.custom-upload:hover {
+  background: #cc0040;
+}
+
+/* Upload icon size */
+.custom-upload img {
+  width: 18px;
+  height: 18px;
+}
