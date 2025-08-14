@@ -1,0 +1,19 @@
+<form id="uploadForm" enctype="multipart/form-data">
+  <input type="file" name="video" accept="video/*">
+  <button type="submit">Upload</button>
+</form>
+
+<script>
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+
+  let res = await fetch('/upload', {
+    method: 'POST',
+    body: formData
+  });
+
+  let data = await res.json();
+  alert(data.message);
+});
+</script>
