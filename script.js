@@ -104,3 +104,166 @@ document.querySelector(".reels-container").addEventListener("touchend", e => {
         window.scrollBy(0, -window.innerHeight);
     }
 });
+
+// script.js
+const reelsContainer = document.getElementById('reels');
+const template = document.getElementById('reelTemplate');
+const sentinel = document.getElementById('sentinel');
+
+let page = 1;
+const limit = 3;
+let loading = false;
+let noMore = false;
+const currentUser = 'guest_user'; // placeholder, in real app use auth
+
+// --- load initial reels ---
+async function loadReels() {
+  if (loading || noMore) return;
+  loading = true;
+  try {
+    const res = await fetch(`/api/reels?page=${page}&limit=${limit}`);
+    const data = await res.json();
+    data.reels.forEach(addReelToDOM);
+    const totalPages = Math.ceil(data.total / data.limit);
+    if (page >= totalPages) noMore = true;
+    page++;
+    observeVideos(); // refresh observer
+  } catch (err) {
+    console.error(err);
+  } finally {
+    loading = false;
+  }
+}
+
+// --- add reel DOM ---
+function addReelToDOM(reelData) {
+  const clone = template.content.cloneNode(true);
+  const reel = clone.querySelector('.reel');
+  const video = clone.querySelector('video');
+  const username = clone.querySelector('.username');
+  const dp = clone.querySelector('.profile-pic');
+  const desc = clone.querySelector('.description');
+  const marquee = clone.querySelector('.marquee');
+  const likeBtn = clone.querySelector('.like-btn');
+  const likeCount = clone.querySelector('.like-count');
+  const commentCount = clone.querySelector('.comment-count');
+  const musicIcon = clone.querySelector('.music-icon');
+
+  video.src = reelData.videoPath;
+  username.textContent = reelData.username;
+  dp.src = reelData.videoPath ? reelData.videoPath : '/default-profile.jpg'; // placeholder
+  desc.textContent = reelData.description;
+  marquee.textContent = reelData.songName || 'Unknown Song';
+  likeCount.textContent = reelData.likes || 0;
+  commentCount.textContent = (reelData.comments || []).length;
+  musicIcon.src = dp.src;
+
+  // like button
+  likeBtn.addEventListener('click', async () => {
+    try {
+      const r = await fetch(`/api/reels/${reelData._id}/like`, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ userId: currentUser })
+      });
+      const j = await r.json();
+      likeCount.textContent = j.likes;
+      if (j.liked) likeBtn.style.color = 'red';
+      else likeBtn.style.color = 'white';
+    } catch (err) { console.error(err); }
+  });
+
+  // comment button (simple prompt)
+  clone.querySelector('.comment-btn').addEventListener('click', async () => {
+    const text = prompt('Type your comment');
+    if (!text) return;
+    try {
+      const r = await fetch(`/api/reels/${reelData._id}/comment`, {
+        method:'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ user: currentUser, text })
+      });
+      const j = await r.json();
+      commentCount.textContent = j.comments.length;
+      alert('Comment added');
+    } catch (err) { console.error(err); }
+  });
+
+  // append
+  reelsContainer.appendChild(clone);
+}
+
+// --- Play/pause based on visibility ---
+function observeVideos() {
+  const videos = document.querySelectorAll('video');
+  const options = { root: null, threshold: 0.75 };
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const v = entry.target;
+      if (entry.isIntersecting) {
+        v.muted = false; // optional: start with muted or not
+        v.play().catch(()=>{});
+      } else {
+        v.pause();
+      }
+    });
+  }, options);
+
+  videos.forEach(v => {
+    observer.observe(v);
+    // double-tap to like
+    let lastTap = 0;
+    v.addEventListener('touchend', e => {
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        // find like button in same reel
+        const likeBtn = v.closest('.reel').querySelector('.like-btn');
+        likeBtn.click();
+      }
+      lastTap = now;
+    });
+  });
+}
+
+// --- Infinite scroll using IntersectionObserver on sentinel ---
+const sentinelObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) loadReels();
+  });
+}, { root: null, rootMargin: '200px' });
+sentinelObserver.observe(sentinel);
+
+// --- Swipe gestures for mobile (simple) ---
+let startY = 0;
+reelsContainer.addEventListener('touchstart', e => startY = e.touches[0].clientY);
+reelsContainer.addEventListener('touchend', e => {
+  const endY = e.changedTouches[0].clientY;
+  if (startY - endY > 100) window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+  else if (endY - startY > 100) window.scrollBy({ top: -window.innerHeight, behavior: 'smooth' });
+});
+
+// --- Upload form handler ---
+const uploadForm = document.getElementById('uploadForm');
+uploadForm.addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const formData = new FormData(uploadForm);
+  try {
+    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+    const j = await res.json();
+    if (j.success) {
+      // prepend new reel at top
+      page = 1; noMore = false; reelsContainer.innerHTML = ''; // reload feed
+      loadReels();
+      alert('Uploaded!');
+      uploadForm.reset();
+    } else {
+      alert('Upload failed');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Upload error');
+  }
+});
+
+// --- initial load ---
+loadReels();
