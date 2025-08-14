@@ -105,3 +105,26 @@ app.get('*', (req,res) => res.sendFile(path.join(__dirname,'public','index.html'
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+
+const app = express();
+
+// Storage setup
+const storage = multer.diskStorage({
+  destination: './uploads',
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage });
+
+// Video upload route
+app.post('/upload', upload.single('video'), (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+  res.json({ message: 'Video uploaded successfully!', file: req.file.filename });
+});
+
+app.listen(3000, () => console.log('Server running on http://localhost:3000'));
