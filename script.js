@@ -267,3 +267,76 @@ uploadForm.addEventListener('submit', async (ev) => {
 
 // --- initial load ---
 loadReels();
+// Import Firebase modules
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { getDatabase, ref as dbRef, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+// 🔹 Your Firebase Config (replace with your own from Firebase Console)
+const firebaseConfig = {
+    apiKey: "YOUR-API-KEY",
+    authDomain: "YOUR-PROJECT.firebaseapp.com",
+    projectId: "YOUR-PROJECT-ID",
+    storageBucket: "YOUR-PROJECT.appspot.com",
+    messagingSenderId: "SENDER-ID",
+    appId: "APP-ID",
+    databaseURL: "https://YOUR-PROJECT.firebaseio.com"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+const db = getDatabase(app);
+
+const reelsContainer = document.getElementById("reelsContainer");
+
+// Upload video
+window.uploadVideo = function () {
+    let file = document.getElementById("videoFile").files[0];
+    let desc = document.getElementById("desc").value;
+
+    if (!file) return alert("Select a video first!");
+
+    let storageRef = ref(storage, "reels/" + file.name);
+    let uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on("state_changed", 
+        () => {},
+        (error) => alert("Error: " + error),
+        () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+                push(dbRef(db, "reels"), { url: url, desc: desc });
+                alert("Uploaded Successfully!");
+            });
+        }
+    );
+};
+
+// Fetch videos & infinite scroll
+let loadedCount = 0;
+const limit = 3;
+let videoData = [];
+
+onChildAdded(dbRef(db, "reels"), (snapshot) => {
+    videoData.push(snapshot.val());
+    if (videoData.length <= limit) displayReel(snapshot.val());
+});
+
+function displayReel(reel) {
+    const reelDiv = document.createElement("div");
+    reelDiv.className = "reel";
+    reelDiv.innerHTML = `
+        <video src="${reel.url}" autoplay muted loop></video>
+        <p style="position:absolute;bottom:20px;left:20px;">${reel.desc}</p>
+    `;
+    reelsContainer.appendChild(reelDiv);
+}
+
+// Infinite scroll
+window.addEventListener("scroll", () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+        let nextVideos = videoData.slice(loadedCount, loadedCount + limit);
+        nextVideos.forEach(displayReel);
+        loadedCount += limit;
+    }
+});
