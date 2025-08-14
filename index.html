@@ -85,25 +85,52 @@
 
       <div class="top-bar">
         <!-- Use onerror to hide broken image -->
-        <img class="profile-pic" src="" alt="dp" onerror="this.style.display='none'"/>
-        <span class="username"></span>
-        <button class="follow-btn">Follow</button>
-      </div>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>User Profile</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
-      <div class="reel-info">
-        <p class="description"></p>
-        <div class="music-bar">🎵 <div class="marquee"></div></div>
-      </div>
-
-      <div class="reel-actions">
-        <button class="like-btn">❤️ <span class="like-count">0</span></button>
-        <button class="comment-btn">💬 <span class="comment-count">0</span></button>
-        <button class="share-btn">📤</button>
-        <img class="music-icon" src="" onerror="this.style.display='none'"/>
-      </div>
+  <header class="top-nav">
+    <div class="brand">MyReels</div>
+    <div class="nav-right">
+      <a class="profile-link" href="index.html">Home</a>
     </div>
-  </template>
+  </header>
 
-  <script src="script.js"></script>
+  <main class="profile-page">
+    <section class="profile-header card">
+      <!-- default avatar used; onerror hides if missing -->
+      <img class="avatar" src="default-avatar.png" alt="avatar" onerror="this.style.display='none'">
+      <div>
+        <h2 id="profileUsername">@guest_user</h2>
+        <p id="profileBio">This is your bio. Edit it in settings.</p>
+        <button id="editProfileBtn">Edit Profile</button>
+      </div>
+    </section>
+
+    <section class="upload-panel card">
+      <h3>Upload a Reel</h3>
+      <form id="uploadForm">
+        <input type="text" name="username" id="u_username" placeholder="Username" required />
+        <input type="text" name="description" id="u_description" placeholder="Description" />
+        <input type="text" name="songName" id="u_song" placeholder="Song name" />
+        <input type="file" name="video" id="u_video" accept="video/*" required />
+        <div><button type="submit">Upload Reel</button></div>
+      </form>
+      <p id="uploadStatus" class="muted"></p>
+    </section>
+
+    <section class="my-reels card">
+      <h3>My Reels</h3>
+      <div id="myReelsList" class="reels-list"></div>
+    </section>
+  </main>
+
+  <script src="user.js"></script>
 </body>
-</html>
+</html>      
