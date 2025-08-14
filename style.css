@@ -259,3 +259,36 @@ body { margin:0; font-family: Arial, sans-serif; background: #000; color: #fff; 
 
 /* sentinel styling (invisible) */
 .sentinel { height: 1px; }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: black;
+    color: white;
+}
+
+.upload-section {
+    padding: 10px;
+    background: #222;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.reels-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.reel {
+    width: 100%;
+    height: 90vh;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
