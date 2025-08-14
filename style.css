@@ -165,3 +165,71 @@ nav a:hover {
         font-size: 13px;
     }
 }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+}
+header {
+  background: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+}
+header h1 {
+  font-size: 20px;
+}
+.profile-btn, .back-btn {
+  background: #007bff;
+  color: white;
+  padding: 6px 10px;
+  text-decoration: none;
+  border-radius: 5px;
+}
+main {
+  padding: 15px;
+}
+.reel {
+  background: white;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.reel video {
+  width: 100%;
+  border-radius: 10px;
+}
+.caption {
+  margin-top: 8px;
+}
+.profile-page h2 {
+  margin-bottom: 15px;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+form input, form button {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+form button {
+  background: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+form button:hover {
+  background: #218838;
+}
