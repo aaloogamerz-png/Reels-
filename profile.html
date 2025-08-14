@@ -1,27 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Profile</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Profile — MyReels</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <header class="topbar">
+    <div class="left">
+      <a href="index.html" class="back">⬅</a>
+    </div>
+    <div class="brand">Profile</div>
+    <div class="right"></div>
+  </header>
 
-<header>
-  <h1>My Profile</h1>
-  <a href="index.html" class="back-btn">⬅ Back</a>
-</header>
+  <main class="profile-page">
+    <section class="profile-card">
+      <img id="profilePic" src="default-avatar.png" alt="avatar" onerror="this.style.display='none'">
+      <div class="profile-meta">
+        <h2 id="profileName">@guest_user</h2>
+        <p id="profileBio">This is your bio. Edit it below.</p>
+      </div>
+    </section>
 
-<main class="profile-page">
-  <h2>Username: <span id="username">Riyan_123</span></h2>
-  
-  <h3>Upload New Reel</h3>
-  <form>
-    <input type="file" accept="video/*">
-    <input type="text" placeholder="Add caption">
-    <button type="submit">Upload</button>
-  </form>
-</main>
+    <section class="upload-card">
+      <h3>Upload New Reel</h3>
+      <form id="uploadForm">
+        <input id="pu_username" type="text" placeholder="Username" required />
+        <input id="pu_song" type="text" placeholder="Song name (optional)" />
+        <textarea id="pu_desc" rows="2" placeholder="Description"></textarea>
+        <input id="pu_video" type="file" accept="video/*" required />
+        <div class="row">
+          <button type="submit">Upload</button>
+          <button id="clearLocal" type="button" class="danger">Clear My Uploads</button>
+        </div>
+        <p id="uploadMsg" class="muted"></p>
+      </form>
+    </section>
 
+    <section class="myreels-card">
+      <h3>My Reels (Local)</h3>
+      <div id="myReelsList" class="reels-list"></div>
+    </section>
+  </main>
+
+  <script src="profile.js"></script>
 </body>
 </html>
